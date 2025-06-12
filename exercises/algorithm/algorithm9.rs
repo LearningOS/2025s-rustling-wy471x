@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,39 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // TODO
+        if self.count + 1 >= self.items.len() {
+            self.items.push(T::default());
+        }
+        self.count += 1;
+        self.items[self.count] = value;
+        self.bubble_up(self.count);
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        let mut current_idx = idx;
+        while current_idx > 1 {
+            let parent_idx = self.parent_idx(current_idx);
+            if (self.comparator)(&self.items[current_idx], &self.items[parent_idx]) {
+                self.items.swap(current_idx, parent_idx);
+                current_idx = parent_idx;
+            } else {
+                break;
+            }
+        }
+    }
+
+    fn bubble_down(&mut self, idx: usize) {
+        let mut current_idx = idx;
+        while self.children_present(current_idx) {
+            let smallest_child_idx = self.smallest_child_idx(current_idx);
+            if (self.comparator)(&self.items[smallest_child_idx], &self.items[current_idx]) {
+                self.items.swap(current_idx, smallest_child_idx);
+                current_idx = smallest_child_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +88,18 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        if self.right_child_idx(idx) > self.count {
+            self.left_child_idx(idx)
+        } else {
+            if (self.comparator)(
+                &self.items[self.left_child_idx(idx)],
+                &self.items[self.right_child_idx(idx)],
+            ) {
+                self.left_child_idx(idx)
+            } else {
+                self.right_child_idx(idx)
+            }
+        }
     }
 }
 
@@ -84,8 +125,14 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.len() == 0 {
+            return None;
+        }
+        // Swap the first element with the last one
+        self.items.swap(1, self.count);
+        self.count -= 1;
+        self.bubble_down(1);
+        Some(self.items.pop().unwrap())
     }
 }
 
